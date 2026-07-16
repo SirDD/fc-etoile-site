@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Der Verein — FC Étoile Biel-Bienne</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700;900&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#E31932;--red-dark:#7E0F1E;--black:#0A0909;--black-soft:#161514;
+    --cream:#F6F3EC;--stone:#8B887E;--stone-light:#D8D4C8;--gold:#C79A3F;
+    --display:'Big Shoulders Display',sans-serif;--body:'Source Sans 3',sans-serif;--mono:'IBM Plex Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--cream);color:var(--black);font-family:var(--body);line-height:1.6;overflow-x:hidden;}
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 32px;}
+  ::selection{background:var(--red);color:var(--cream);}
+
+  header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,9,9,0.92);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,0.08);}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;max-width:1200px;margin:0 auto;}
+  .brand{display:flex;align-items:center;gap:12px;font-family:var(--display);color:var(--cream);font-size:20px;font-weight:700;letter-spacing:.5px;}
+  .brand svg{width:28px;height:28px;flex-shrink:0;}
+  .navlinks{display:flex;gap:32px;align-items:center;}
+  .navlinks a{position:relative;color:var(--stone-light);font-size:12.5px;letter-spacing:1.4px;text-transform:uppercase;font-weight:600;padding-bottom:4px;}
+  .navlinks a.active{color:var(--red);}
+  .navlinks a::after{content:'';position:absolute;left:0;bottom:0;width:0;height:2px;background:var(--red);transition:width .25s;}
+  .navlinks a:hover::after{width:100%;}
+  .navlinks .cta{background:var(--red);color:var(--cream);padding:9px 18px;border-radius:2px;}
+  .navlinks .cta::after{display:none;}
+  .langs{display:flex;gap:6px;margin-left:6px;}
+  .langs a{background:none;border:1px solid rgba(255,255,255,.25);color:var(--stone-light);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:2px;cursor:pointer;}
+  .langs a.active,.langs a:hover{border-color:var(--red);color:var(--cream);background:var(--red);}
+  @media(max-width:940px){.navlinks a:not(.cta){display:none;}}
+
+  .pagehero{background:var(--black);color:var(--cream);padding:170px 0 90px;position:relative;overflow:hidden;}
+  .pagehero-star{position:absolute;right:-4%;top:50%;transform:translateY(-50%);width:520px;height:520px;opacity:.05;stroke:var(--cream);fill:none;stroke-width:1;}
+  .pagehero .eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:18px;display:flex;align-items:center;gap:10px;}
+  .pagehero .eyebrow::before{content:'';width:28px;height:1px;background:var(--gold);}
+  .pagehero h1{font-family:var(--display);font-weight:900;font-size:clamp(46px,7vw,92px);text-transform:uppercase;line-height:.92;letter-spacing:-1px;}
+
+  section{padding:110px 0;}
+  .section-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:56px;gap:24px;flex-wrap:wrap;}
+  .section-num{font-family:var(--mono);font-size:13px;color:var(--red);letter-spacing:2px;margin-bottom:14px;}
+  h2.section-title{font-family:var(--display);font-weight:900;font-size:clamp(32px,4.5vw,54px);text-transform:uppercase;line-height:.98;letter-spacing:-.5px;}
+  .section-desc{max-width:380px;color:var(--stone);font-size:15px;}
+
+  .histoire{background:var(--cream);}
+  .histoire-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:80px;align-items:start;}
+  .histoire-grid p.lead{font-size:21px;line-height:1.55;color:var(--black-soft);margin-bottom:22px;font-weight:500;}
+  .histoire-grid p{color:var(--stone);font-size:15.5px;margin-bottom:16px;}
+  .values{display:flex;flex-direction:column;border-top:1px solid var(--stone-light);}
+  .value{display:flex;justify-content:space-between;align-items:center;padding:22px 0;border-bottom:1px solid var(--stone-light);transition:padding-left .25s;}
+  .value:hover{padding-left:10px;}
+  .value .num{font-family:var(--mono);color:var(--red);font-size:13px;}
+  .value .name{font-family:var(--display);font-size:23px;font-weight:700;text-transform:uppercase;}
+  @media(max-width:860px){.histoire-grid{grid-template-columns:1fr;gap:40px;}}
+
+  .infra{background:var(--black-soft);color:var(--cream);}
+  .infra .section-desc{color:var(--stone-light);}
+  .infra-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.1);}
+  .infra-card{background:var(--black);padding:34px 28px;}
+  .infra-card h3{font-family:var(--display);font-size:22px;text-transform:uppercase;margin-bottom:12px;}
+  .infra-card p{color:var(--stone-light);font-size:14.5px;}
+
+  .comite{background:var(--black);color:var(--cream);}
+  .comite .section-desc{color:var(--stone-light);}
+  .lead-row{display:flex;gap:2px;margin-bottom:2px;}
+  .lead-card{flex:1;background:var(--red);color:var(--cream);padding:30px 28px;position:relative;overflow:hidden;}
+  .lead-card:nth-child(2){background:var(--red-dark);}
+  .lead-role{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;opacity:.85;}
+  .lead-name{font-family:var(--display);font-size:30px;font-weight:700;margin-top:8px;}
+  .chapters{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;margin-top:2px;}
+  .chapter{background:var(--black-soft);padding:26px 22px;min-height:230px;display:flex;flex-direction:column;justify-content:space-between;border:1px solid transparent;transition:border-color .25s,transform .25s;}
+  .chapter:hover{border-color:var(--red);transform:translateY(-4px);}
+  .chapter .ch-num{font-family:var(--mono);font-size:11px;color:var(--gold);letter-spacing:1.5px;}
+  .chapter .ch-name{font-family:var(--display);font-size:20px;font-weight:700;text-transform:uppercase;margin-top:10px;line-height:1;}
+  .chapter .ch-people{margin-top:18px;font-size:12px;color:var(--stone);font-family:var(--mono);}
+  .chapter .ch-people span{display:block;color:var(--stone-light);margin-top:3px;}
+  .chapter .ch-tasks{margin-top:14px;font-size:11px;color:var(--stone);line-height:1.5;}
+  @media(max-width:960px){.chapters{grid-template-columns:repeat(3,1fr);}.lead-row{flex-direction:column;}}
+  @media(max-width:600px){.chapters{grid-template-columns:repeat(2,1fr);}}
+
+  footer{background:var(--black);color:var(--stone);padding-top:70px;border-top:1px solid rgba(255,255,255,.1);}
+  .foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:40px;padding-bottom:50px;border-bottom:1px solid rgba(255,255,255,.08);}
+  .foot-brand{font-family:var(--display);font-size:22px;color:var(--cream);text-transform:uppercase;margin-bottom:10px;}
+  .foot-tagline{font-size:14px;color:var(--stone);max-width:260px;}
+  .foot-col h4{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--stone-light);margin-bottom:16px;}
+  .foot-col a{display:block;font-size:14px;color:var(--stone);margin-bottom:10px;transition:color .2s;}
+  .foot-col a:hover{color:var(--cream);}
+  .foot-bottom{display:flex;justify-content:space-between;align-items:center;padding:26px 0;flex-wrap:wrap;gap:10px;}
+  .foot-meta{font-family:var(--mono);font-size:11px;color:var(--stone);}
+  @media(max-width:860px){.foot-grid{grid-template-columns:1fr 1fr;}}
+
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease;}
+  .reveal.in{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <a href="index.html" class="brand">
+      <svg viewBox="0 0 100 100"><path fill="#E31932" d="M50 4 L61 36 L96 36 L68 57 L79 90 L50 70 L21 90 L32 57 L4 36 L39 36 Z"/></svg>
+      FC Étoile Biel-Bienne
+    </a>
+    <div class="navlinks">
+      <a href="index.html">Startseite</a>
+      <a href="club.html" class="active">Verein</a>
+      <a href="index.html#equipes">Mannschaften</a>
+      <a href="../calendrier.html">Spielplan</a>
+      <a href="../actualites.html">Neuigkeiten</a>
+      <a href="../boutique.html">Fanshop</a>
+      <a href="../tv.html">Étoile TV</a>
+      <a href="index.html#contact" class="cta">Mitmachen</a>
+      <div class="langs"><a href="../club.html">FR</a><a class="active" href="club.html">DE</a><a href="../en/club.html">EN</a></div>
+    </div>
+  </nav>
+</header>
+
+<section class="pagehero">
+  <svg class="pagehero-star" viewBox="0 0 100 100"><path d="M50 4 L61 36 L96 36 L68 57 L79 90 L50 70 L21 90 L32 57 L4 36 L39 36 Z"/></svg>
+  <div class="wrap">
+    <div class="eyebrow">Depuis 1967</div>
+    <h1>Der Verein</h1>
+  </div>
+</section>
+
+<section class="histoire reveal">
+  <div class="wrap">
+    <div class="section-head">
+      <div><div class="section-num">01 — Geschichte</div><h2 class="section-title">Unsere Geschichte</h2></div>
+      <p class="section-desc">Seit 1967.</p>
+    </div>
+    <div class="histoire-grid">
+      <div>
+        <p class="lead">1967 gegründet, trägt der FC Étoile Biel-Bienne seit fast 60 Jahren Schwarz und Rot.</p>
+        <p>Neun Mannschaften, von den Junioren bis zur ersten Mannschaft, füllen den Verein jede Woche mit Leben, getragen von Generationen von Spielern, Trainern und Freiwilligen.</p>
+        <p style="font-style:italic;color:var(--stone);">Die vollst&auml;ndige Vereinsgeschichte — wichtige Daten, pr&auml;gende Momente und Archivfotos — wird hier in K&uuml;rze erg&auml;nzt.</p>
+      </div>
+      <div class="values">
+        <div class="value"><span class="name">Respekt</span><span class="num">01</span></div>
+        <div class="value"><span class="name">Engagement</span><span class="num">02</span></div>
+        <div class="value"><span class="name">Teamgeist</span><span class="num">03</span></div>
+        <div class="value"><span class="name">Geselligkeit</span><span class="num">04</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="infra reveal">
+  <div class="wrap">
+    <div class="section-head">
+      <div><div class="section-num" style="color:var(--red)">02 — Infrastruktur</div><h2 class="section-title">Unsere Anlagen</h2></div>
+      <p class="section-desc">Biel/Bienne.</p>
+    </div>
+    <div class="infra-grid">
+      <div class="infra-card"><h3>Hauptplatz</h3><p>Trainings- und Spielfeld f&uuml;r alle Mannschaften des Vereins in Biel/Bienne.</p></div>
+      <div class="infra-card"><h3>Vereinsbeiz</h3><p>Das gesellschaftliche Herz des Vereins an Spieltagen — offen f&uuml;r alle, Mitglieder wie G&auml;ste.</p></div>
+      <div class="infra-card"><h3>Garderoben &amp; Anlagen</h3><p>Gepflegt vom Ressort Unterhalt, in Zusammenarbeit mit der Stadt Biel/Bienne.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="comite reveal" id="comite">
+  <div class="wrap">
+    <div class="section-head">
+      <div><div class="section-num">03 — Organisation</div><h2 class="section-title">Der Vorstand</h2></div>
+      <p class="section-desc">Ein Pr&auml;sident, ein Vizepr&auml;sident, zehn Ressorts — die Struktur, die den Verein Tag f&uuml;r Tag am Laufen h&auml;lt.</p>
+    </div>
+
+    <div class="lead-row">
+      <div class="lead-card"><div class="lead-role">Pr&auml;sident</div><div class="lead-name">Nassir</div></div>
+      <div class="lead-card"><div class="lead-role">Vizepr&auml;sident</div><div class="lead-name">Anthony</div></div>
+    </div>
+
+    <div class="chapters">
+      <div class="chapter"><div><div class="ch-num">Ressort 01</div><div class="ch-name">Finanzen</div></div><div class="ch-people">Verantwortlich<span>Nom</span>Unterst&uuml;tzung<span>Doriano</span></div></div>
+      <div class="chapter"><div><div class="ch-num">Ressort 02</div><div class="ch-name">Sponsoring</div></div><div class="ch-people">Verantwortlich<span>Jerome</span></div></div>
+      <div class="chapter"><div><div class="ch-num">Ressort 03</div><div class="ch-name">Juniors</div></div><div class="ch-people">Verantwortlich<span>Diego</span></div></div>
+      <div class="chapter"><div><div class="ch-num">Ressort 04</div><div class="ch-name">Marketing</div></div><div class="ch-people">Verantwortlich<span>David</span></div></div>
+      <div class="chapter"><div><div class="ch-num">Ressort 05</div><div class="ch-name">Verwaltung</div></div><div class="ch-people">Verantwortlich<span>Nom</span></div></div>
+      <div class="chapter"><div><div class="ch-num">Ressort 06</div><div class="ch-name">Logistik</div></div><div class="ch-people">Verantwortlich<span>Marko</span></div></div>
+      <div class="chapter"><div><div class="ch-num">Ressort 07</div><div class="ch-name">Veranstaltungen</div></div><div class="ch-people">Verantwortlich<span>Nom</span></div></div>
+      <div class="chapter"><div><div class="ch-num">Ressort 08</div><div class="ch-name">Schiedsrichter</div></div><div class="ch-people">Verantwortlich<span>Samuel</span></div></div>
+      <div class="chapter"><div><div class="ch-num">Ressort 09</div><div class="ch-name">Vereinsbeiz</div></div><div class="ch-people">Verantwortlich<span>Nassir</span>Unterst&uuml;tzung<span>David</span></div></div>
+      <div class="chapter"><div><div class="ch-num">Ressort 10</div><div class="ch-name">Sportlicher Leiter</div></div><div class="ch-people">Verantwortlich<span>Rafael</span></div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">FC Étoile Biel-Bienne</div>
+        <p class="foot-tagline">Ein Verein. Eine Leidenschaft. Eine Familie. Seit 1967.</p>
+      </div>
+      <div class="foot-col"><h4>Verein</h4><a href="club.html">Geschichte</a><a href="club.html#comite">Vorstand</a><a href="index.html#equipes">Mannschaften</a></div>
+      <div class="foot-col"><h4>Folgen</h4><a href="../actualites.html">Neuigkeiten</a><a href="../calendrier.html">Spielplan</a><a href="../tv.html">Étoile TV</a></div>
+      <div class="foot-col"><h4>Mitmachen</h4><a href="index.html#recrutement">Spieler werden</a><a href="../boutique.html">Fanshop</a><a href="index.html#contact">Kontakt</a></div>
+    </div>
+    <div class="foot-bottom">
+      <div class="foot-meta">© 2026 FC Étoile Biel-Bienne — Seit 1967</div>
+      <div class="foot-meta">Biel/Bienne</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const els = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');}});},{threshold:0.1});
+  els.forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

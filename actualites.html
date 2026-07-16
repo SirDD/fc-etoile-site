@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Actualités — FC Étoile Biel-Bienne</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700;900&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#E31932;--red-dark:#7E0F1E;--black:#0A0909;--black-soft:#161514;
+    --cream:#F6F3EC;--stone:#8B887E;--stone-light:#D8D4C8;--gold:#C79A3F;
+    --display:'Big Shoulders Display',sans-serif;--body:'Source Sans 3',sans-serif;--mono:'IBM Plex Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--cream);color:var(--black);font-family:var(--body);line-height:1.6;overflow-x:hidden;}
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 32px;}
+  ::selection{background:var(--red);color:var(--cream);}
+
+  header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,9,9,0.92);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,0.08);}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;max-width:1200px;margin:0 auto;}
+  .brand{display:flex;align-items:center;gap:12px;font-family:var(--display);color:var(--cream);font-size:20px;font-weight:700;letter-spacing:.5px;}
+  .brand svg{width:28px;height:28px;flex-shrink:0;}
+  .navlinks{display:flex;gap:32px;align-items:center;}
+  .navlinks a{position:relative;color:var(--stone-light);font-size:12.5px;letter-spacing:1.4px;text-transform:uppercase;font-weight:600;padding-bottom:4px;}
+  .navlinks a.active{color:var(--red);}
+  .navlinks a::after{content:'';position:absolute;left:0;bottom:0;width:0;height:2px;background:var(--red);transition:width .25s;}
+  .navlinks a:hover::after{width:100%;}
+  .navlinks .cta{background:var(--red);color:var(--cream);padding:9px 18px;border-radius:2px;}
+  .navlinks .cta::after{display:none;}
+  .langs{display:flex;gap:6px;margin-left:6px;}
+  .langs button{background:none;border:1px solid rgba(255,255,255,.25);color:var(--stone-light);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:2px;cursor:pointer;}
+  .langs button.active,.langs button:hover{border-color:var(--red);color:var(--cream);background:var(--red);}
+  @media(max-width:940px){.navlinks a:not(.cta){display:none;}}
+
+  .pagehero{background:var(--black);color:var(--cream);padding:170px 0 70px;position:relative;overflow:hidden;}
+  .pagehero-star{position:absolute;right:-4%;top:50%;transform:translateY(-50%);width:520px;height:520px;opacity:.05;stroke:var(--cream);fill:none;stroke-width:1;}
+  .pagehero .eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:18px;display:flex;align-items:center;gap:10px;}
+  .pagehero .eyebrow::before{content:'';width:28px;height:1px;background:var(--gold);}
+  .pagehero h1{font-family:var(--display);font-weight:900;font-size:clamp(46px,7vw,92px);text-transform:uppercase;line-height:.92;letter-spacing:-1px;}
+
+  .filters{background:var(--black);padding:0 0 60px;}
+  .filter-row{display:flex;gap:10px;flex-wrap:wrap;}
+  .filter-chip{font-family:var(--mono);font-size:12px;letter-spacing:1px;text-transform:uppercase;padding:9px 18px;border:1px solid rgba(255,255,255,.25);color:var(--stone-light);border-radius:2px;cursor:pointer;transition:all .2s;}
+  .filter-chip.active,.filter-chip:hover{background:var(--red);border-color:var(--red);color:#fff;}
+
+  section.grid-sec{background:var(--cream);padding:90px 0 130px;}
+  .news-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--stone-light);border:1px solid var(--stone-light);}
+  .news-card{background:var(--cream);padding:34px 30px;transition:background .2s,color .2s;cursor:pointer;display:flex;flex-direction:column;min-height:260px;}
+  .news-card:hover{background:var(--black);color:var(--cream);}
+  .nc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+  .nc-tag{font-family:var(--mono);font-size:10.5px;color:var(--red);border:1px solid var(--red);padding:3px 9px;}
+  .nc-date{font-family:var(--mono);font-size:11px;color:var(--stone);}
+  .nc-title{font-family:var(--display);font-size:25px;font-weight:700;text-transform:uppercase;line-height:1.02;margin-bottom:14px;}
+  .nc-excerpt{font-size:13.5px;color:var(--stone);margin-top:auto;}
+  .news-card:hover .nc-excerpt{color:var(--stone-light);}
+  .nc-feat{grid-column:span 2;}
+  @media(max-width:960px){.news-grid{grid-template-columns:repeat(2,1fr);}.nc-feat{grid-column:span 2;}}
+  @media(max-width:640px){.news-grid{grid-template-columns:1fr;}.nc-feat{grid-column:span 1;}}
+
+  footer{background:var(--black);color:var(--stone);padding-top:70px;border-top:1px solid rgba(255,255,255,.1);}
+  .foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:40px;padding-bottom:50px;border-bottom:1px solid rgba(255,255,255,.08);}
+  .foot-brand{font-family:var(--display);font-size:22px;color:var(--cream);text-transform:uppercase;margin-bottom:10px;}
+  .foot-tagline{font-size:14px;color:var(--stone);max-width:260px;}
+  .foot-col h4{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--stone-light);margin-bottom:16px;}
+  .foot-col a{display:block;font-size:14px;color:var(--stone);margin-bottom:10px;transition:color .2s;}
+  .foot-col a:hover{color:var(--cream);}
+  .foot-bottom{display:flex;justify-content:space-between;align-items:center;padding:26px 0;flex-wrap:wrap;gap:10px;}
+  .foot-meta{font-family:var(--mono);font-size:11px;color:var(--stone);}
+  @media(max-width:860px){.foot-grid{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <a href="index.html" class="brand">
+      <svg viewBox="0 0 100 100"><path fill="#E31932" d="M50 4 L61 36 L96 36 L68 57 L79 90 L50 70 L21 90 L32 57 L4 36 L39 36 Z"/></svg>
+      FC Étoile Biel-Bienne
+    </a>
+    <div class="navlinks">
+      <a href="index.html">Accueil</a>
+      <a href="club.html">Club</a>
+      <a href="index.html#equipes">Équipes</a>
+      <a href="calendrier.html">Calendrier</a>
+      <a href="actualites.html" class="active">Actualités</a>
+      <a href="boutique.html">Boutique</a>
+      <a href="tv.html">Étoile TV</a>
+      <a href="index.html#contact" class="cta">Nous rejoindre</a>
+      <div class="langs"><button class="active">FR</button><button>DE</button><button>EN</button></div>
+    </div>
+  </nav>
+</header>
+
+<section class="pagehero">
+  <svg class="pagehero-star" viewBox="0 0 100 100"><path d="M50 4 L61 36 L96 36 L68 57 L79 90 L50 70 L21 90 L32 57 L4 36 L39 36 Z"/></svg>
+  <div class="wrap">
+    <div class="eyebrow">Vie du club</div>
+    <h1>Actualités</h1>
+  </div>
+</section>
+
+<section class="filters">
+  <div class="wrap">
+    <div class="filter-row">
+      <div class="filter-chip active">Tout</div>
+      <div class="filter-chip">Club</div>
+      <div class="filter-chip">Sportif</div>
+      <div class="filter-chip">Juniors</div>
+      <div class="filter-chip">Événements</div>
+    </div>
+  </div>
+</section>
+
+<section class="grid-sec">
+  <div class="wrap">
+    <div class="news-grid">
+      <div class="news-card nc-feat">
+        <div class="nc-top"><span class="nc-tag">Club</span><span class="nc-date">14.07.2026</span></div>
+        <div class="nc-title">Le nouveau comité est en place</div>
+        <p class="nc-excerpt">Dix pôles, un président et un vice-président : le FC Étoile officialise sa nouvelle organisation pour la saison 2026/27.</p>
+      </div>
+      <div class="news-card">
+        <div class="nc-top"><span class="nc-tag">Sportif</span><span class="nc-date">30.06.2026</span></div>
+        <div class="nc-title">Bilan de la saison 2025/26</div>
+        <p class="nc-excerpt">Retour sur une saison marquante pour les neuf équipes du club.</p>
+      </div>
+      <div class="news-card">
+        <div class="nc-top"><span class="nc-tag">Juniors</span><span class="nc-date">12.06.2026</span></div>
+        <div class="nc-title">Tournoi juniors du club</div>
+        <p class="nc-excerpt">Une belle journée de football et de convivialité pour nos plus jeunes.</p>
+      </div>
+      <div class="news-card">
+        <div class="nc-top"><span class="nc-tag">Événements</span><span class="nc-date">28.05.2026</span></div>
+        <div class="nc-title">Soirée des sponsors 2026</div>
+        <p class="nc-excerpt">Merci à nos partenaires pour leur soutien continu au club.</p>
+      </div>
+      <div class="news-card">
+        <div class="nc-top"><span class="nc-tag">Sportif</span><span class="nc-date">10.05.2026</span></div>
+        <div class="nc-title">Victoire de la 1ère équipe face à Boujean 34</div>
+        <p class="nc-excerpt">Un match disputé qui se termine sur un score de 2–1.</p>
+      </div>
+      <div class="news-card">
+        <div class="nc-top"><span class="nc-tag">Club</span><span class="nc-date">02.05.2026</span></div>
+        <div class="nc-title">Le club recrute joueurs et bénévoles</div>
+        <p class="nc-excerpt">Toutes catégories, tous niveaux — rejoignez l'étoile pour la nouvelle saison.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">FC Étoile Biel-Bienne</div>
+        <p class="foot-tagline">Un club. Une passion. Une famille. Depuis 1967.</p>
+      </div>
+      <div class="foot-col"><h4>Club</h4><a href="club.html">Histoire</a><a href="club.html#comite">Comité</a><a href="index.html#equipes">Équipes</a></div>
+      <div class="foot-col"><h4>Suivre</h4><a href="actualites.html">Actualités</a><a href="calendrier.html">Calendrier</a><a href="tv.html">Étoile TV</a></div>
+      <div class="foot-col"><h4>Nous rejoindre</h4><a href="index.html#recrutement">Devenir joueur</a><a href="boutique.html">Boutique</a><a href="index.html#contact">Contact</a></div>
+    </div>
+    <div class="foot-bottom">
+      <div class="foot-meta">© 2026 FC Étoile Biel-Bienne — Depuis 1967</div>
+      <div class="foot-meta">Biel/Bienne</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.filter-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Étoile TV — FC Étoile Biel-Bienne</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700;900&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#E31932;--red-dark:#7E0F1E;--black:#0A0909;--black-soft:#161514;
+    --cream:#F6F3EC;--stone:#8B887E;--stone-light:#D8D4C8;--gold:#C79A3F;
+    --display:'Big Shoulders Display',sans-serif;--body:'Source Sans 3',sans-serif;--mono:'IBM Plex Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--black);color:var(--cream);font-family:var(--body);line-height:1.6;overflow-x:hidden;}
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 32px;}
+  header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,9,9,0.92);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,0.08);}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;max-width:1200px;margin:0 auto;}
+  .brand{display:flex;align-items:center;gap:12px;font-family:var(--display);color:var(--cream);font-size:20px;font-weight:700;}
+  .brand svg{width:28px;height:28px;}
+  .navlinks{display:flex;gap:26px;align-items:center;}
+  .navlinks a{color:var(--stone-light);font-size:12px;letter-spacing:1.2px;text-transform:uppercase;font-weight:600;}
+  .navlinks a.active{color:var(--red);}
+  .navlinks .cta{background:var(--red);color:var(--cream);padding:9px 16px;border-radius:2px;}
+  @media(max-width:1080px){.navlinks a:not(.cta){display:none;}}
+
+  .hero{position:relative;padding:180px 0 100px;overflow:hidden;text-align:center;}
+  .scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 2px,transparent 2px 4px);pointer-events:none;}
+  .glow{position:absolute;left:50%;top:30%;transform:translate(-50%,-50%);width:900px;height:900px;background:radial-gradient(circle,rgba(227,25,50,.18) 0%,transparent 65%);z-index:0;}
+  .hero-inner{position:relative;z-index:2;}
+  .eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:3px;color:var(--red);text-transform:uppercase;margin-bottom:18px;display:flex;align-items:center;justify-content:center;gap:10px;}
+  .eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--red);animation:blink 1.4s infinite;}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
+  h1{font-family:var(--display);font-weight:900;font-size:clamp(56px,11vw,150px);text-transform:uppercase;line-height:.85;letter-spacing:-2px;}
+  h1 span{color:var(--red);}
+  .hero p{margin:26px auto 0;max-width:480px;color:var(--stone-light);font-size:17px;}
+
+  .player-mock{position:relative;z-index:2;max-width:960px;margin:70px auto 0;aspect-ratio:16/9;background:linear-gradient(135deg,#1a1918,#0a0909);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;border-radius:4px;overflow:hidden;}
+  .player-mock::before{content:'';position:absolute;inset:0;background:conic-gradient(from 0deg at 50% 50%,transparent 0deg,rgba(227,25,50,.08) 30deg,transparent 60deg);animation:spin 20s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .play-btn{position:relative;z-index:2;width:84px;height:84px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .2s;}
+  .play-btn:hover{transform:scale(1.08);}
+  .play-btn::after{content:'';border-left:22px solid #fff;border-top:14px solid transparent;border-bottom:14px solid transparent;margin-left:6px;}
+  .live-tag{position:absolute;top:20px;left:20px;background:var(--red);font-family:var(--mono);font-size:11px;letter-spacing:1px;padding:5px 10px;border-radius:2px;z-index:2;}
+
+  section{padding:110px 0;}
+  .section-num{font-family:var(--mono);font-size:13px;color:var(--red);letter-spacing:2px;margin-bottom:14px;}
+  h2.section-title{font-family:var(--display);font-weight:900;font-size:clamp(30px,4.5vw,50px);text-transform:uppercase;line-height:.98;letter-spacing:-.5px;margin-bottom:56px;}
+
+  .show-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.08);}
+  .show{background:var(--black-soft);padding:0;position:relative;overflow:hidden;}
+  .show-visual{height:220px;background:linear-gradient(135deg,#1a1918,#0a0909);display:flex;align-items:center;justify-content:center;position:relative;}
+  .show-visual .mini-play{width:52px;height:52px;border-radius:50%;border:2px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;}
+  .show-visual .mini-play::after{content:'';border-left:14px solid #fff;border-top:9px solid transparent;border-bottom:9px solid transparent;margin-left:4px;}
+  .soon-tag{position:absolute;top:14px;right:14px;font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;background:var(--red);color:#fff;padding:5px 10px;border-radius:2px;}
+  .show-info{padding:22px 24px 28px;}
+  .show-cat{font-family:var(--mono);font-size:10.5px;color:var(--red);letter-spacing:1.5px;text-transform:uppercase;}
+  .show-name{font-family:var(--display);font-size:22px;font-weight:700;text-transform:uppercase;margin-top:8px;}
+  .show-desc{font-size:13.5px;color:var(--stone);margin-top:8px;}
+  @media(max-width:860px){.show-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:560px){.show-grid{grid-template-columns:1fr;}}
+
+  footer{background:var(--black);color:var(--stone);padding-top:70px;border-top:1px solid rgba(255,255,255,.1);}
+  .foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:40px;padding-bottom:50px;border-bottom:1px solid rgba(255,255,255,.08);}
+  .foot-brand{font-family:var(--display);font-size:22px;color:var(--cream);text-transform:uppercase;margin-bottom:10px;}
+  .foot-tagline{font-size:14px;color:var(--stone);max-width:260px;}
+  .foot-col h4{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--stone-light);margin-bottom:16px;}
+  .foot-col a{display:block;font-size:14px;color:var(--stone);margin-bottom:10px;}
+  .foot-bottom{display:flex;justify-content:space-between;padding:26px 0;flex-wrap:wrap;gap:10px;}
+  .foot-meta{font-family:var(--mono);font-size:11px;color:var(--stone);}
+  @media(max-width:860px){.foot-grid{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+<header>
+  <nav>
+    <a href="index.html" class="brand"><svg viewBox="0 0 100 100"><path fill="#E31932" d="M50 4 L61 36 L96 36 L68 57 L79 90 L50 70 L21 90 L32 57 L4 36 L39 36 Z"/></svg>FC Étoile Biel-Bienne</a>
+    <div class="navlinks">
+      <a href="index.html">Accueil</a><a href="club.html">Club</a><a href="calendrier.html">Calendrier</a>
+      <a href="actualites.html">Actualités</a><a href="boutique.html">Boutique</a><a href="tv.html" class="active">Étoile TV</a>
+      <a href="index.html#contact" class="cta">Nous rejoindre</a>
+    </div>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="scan"></div>
+  <div class="glow"></div>
+  <div class="hero-inner wrap">
+    <div class="eyebrow"><span class="dot"></span>Bientôt en ligne</div>
+    <h1>Étoile<span>TV</span></h1>
+    <p>Résumés de match, interviews, coulisses du club — bientôt en vidéo, directement sur le site.</p>
+
+    <div class="player-mock">
+      <div class="live-tag">● À VENIR</div>
+      <div class="play-btn"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-num">Programmes à venir</div>
+    <h2 class="section-title">Ce qui arrive sur Étoile TV</h2>
+    <div class="show-grid">
+      <div class="show">
+        <div class="show-visual"><div class="mini-play"></div><span class="soon-tag">Bientôt</span></div>
+        <div class="show-info"><div class="show-cat">Résumés</div><div class="show-name">Les buts du week-end</div><p class="show-desc">Le résumé de tous les matchs du club, équipe par équipe.</p></div>
+      </div>
+      <div class="show">
+        <div class="show-visual"><div class="mini-play"></div><span class="soon-tag">Bientôt</span></div>
+        <div class="show-info"><div class="show-cat">Interviews</div><div class="show-name">Face à l'étoile</div><p class="show-desc">Rencontre avec les joueurs et le staff après chaque match.</p></div>
+      </div>
+      <div class="show">
+        <div class="show-visual"><div class="mini-play"></div><span class="soon-tag">Bientôt</span></div>
+        <div class="show-info"><div class="show-cat">Coulisses</div><div class="show-name">Dans les coulisses</div><p class="show-desc">Entraînements, vie du club et moments partagés.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div><div class="foot-brand">FC Étoile Biel-Bienne</div><p class="foot-tagline">Un club. Une passion. Une famille. Depuis 1967.</p></div>
+      <div class="foot-col"><h4>Club</h4><a href="club.html">Histoire</a><a href="club.html#comite">Comité</a><a href="index.html#equipes">Équipes</a></div>
+      <div class="foot-col"><h4>Suivre</h4><a href="actualites.html">Actualités</a><a href="calendrier.html">Calendrier</a><a href="tv.html">Étoile TV</a></div>
+      <div class="foot-col"><h4>Nous rejoindre</h4><a href="index.html#recrutement">Devenir joueur</a><a href="boutique.html">Boutique</a><a href="index.html#contact">Contact</a></div>
+    </div>
+    <div class="foot-bottom"><div class="foot-meta">© 2026 FC Étoile Biel-Bienne — Depuis 1967</div><div class="foot-meta">Biel/Bienne</div></div>
+  </div>
+</footer>
+</body>
+</html>
