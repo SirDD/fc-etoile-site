@@ -197,6 +197,15 @@ function extractStandings(text: string, isMarkdown: boolean): Record<string, Sta
 export default async (req: Request, context: Context) => {
   try {
     const { content, usedSource, isMarkdown } = await fetchFirstWorking();
+
+    const url = new URL(req.url);
+    if (url.searchParams.get("raw") === "1") {
+      // temporary debug mode — returns a slice of the raw content around the first standings table
+      const anchor = content.indexOf("4e ligue");
+      const snippet = anchor !== -1 ? content.slice(anchor, anchor + 2500) : content.slice(0, 2500);
+      return new Response(snippet, { headers: { "Content-Type": "text/plain; charset=utf-8" } });
+    }
+
     const matches = extractMatches(content, isMarkdown);
 
     let standings: Record<string, StandingRow[]> = {};
