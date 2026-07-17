@@ -1,14 +1,15 @@
 import type { Context, Config } from "@netlify/functions";
 
-// Known categories for FC Etoile Biel (from the ASF match center)
-const CATEGORIES = [
-  "4e ligue",
-  "5e ligue b",
-  "Seniors 30+",
-  "Juniors D-9",
-  "Juniors E a",
-  "Juniors F",
-  "Juniors G"
+// Known categories for FC Etoile Biel — 'match' is the text that appears in the
+// page's section heading, 'label' is the friendly name we display on the site.
+const CATEGORY_PATTERNS: { match: string; label: string }[] = [
+  { match: "4e ligue", label: "4e ligue" },
+  { match: "5e ligue", label: "5e ligue b" },
+  { match: "Seniors 30+", label: "Seniors 30+" },
+  { match: "Juniors D-9", label: "Juniors D-9" },
+  { match: "Juniors E", label: "Juniors E a" },
+  { match: "Juniors F", label: "Juniors F" },
+  { match: "Juniors G", label: "Juniors G" }
 ];
 
 const SOURCE_URL = "https://matchcenter.fvbj-afbj.ch/default.aspx?v=1316&oid=6&lng=2&a=rr";
@@ -56,13 +57,13 @@ async function fetchFirstWorking(): Promise<{ content: string; usedSource: strin
   throw new Error("Toutes les sources ont échoué — " + errors.join(" | "));
 }
 
-function findNearestBefore(text: string, pos: number, needles: string[]): string | null {
-  let best: { name: string; idx: number } | null = null;
-  for (const name of needles) {
-    const idx = text.lastIndexOf(name, pos);
-    if (idx !== -1 && (!best || idx > best.idx)) best = { name, idx };
+function findNearestCategoryBefore(text: string, pos: number): string | null {
+  let best: { label: string; idx: number } | null = null;
+  for (const { match, label } of CATEGORY_PATTERNS) {
+    const idx = text.lastIndexOf(match, pos);
+    if (idx !== -1 && (!best || idx > best.idx)) best = { label, idx };
   }
-  return best ? best.name : null;
+  return best ? best.label : null;
 }
 
 const DATE_RE_SRC = "(?:Lu|Ma|Me|Je|Ve|Sa|Di)\\s\\d{2}\\.\\d{2}\\.\\d{4}";
@@ -124,7 +125,7 @@ function extractMatches(text: string, isMarkdown: boolean): MatchInfo[] {
         nearestDate = d.text;
       }
     }
-    const category = findNearestBefore(fullText, pos, CATEGORIES);
+    const category = findNearestCategoryBefore(fullText, pos);
     out.push({ date: nearestDate, time, home: isHome, ourTeam, opponent, category, detailUrl: href });
   }
 
