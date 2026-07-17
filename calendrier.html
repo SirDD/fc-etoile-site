@@ -67,6 +67,18 @@
   .m-cat{font-family:var(--mono);font-size:10px;background:var(--black);color:#fff;padding:3px 8px;border-radius:2px;}
   @media(max-width:760px){.match-row{grid-template-columns:1fr;gap:10px;}.m-meta{align-items:flex-start;}}
 
+  .standings-wrap{margin-top:70px;}
+  .standings-title{font-family:var(--mono);font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--red);margin-bottom:16px;}
+  table.standings{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--stone-light);margin-bottom:40px;}
+  table.standings th{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--stone);text-align:center;padding:10px 8px;border-bottom:2px solid var(--black);}
+  table.standings th:first-child{text-align:left;padding-left:16px;}
+  table.standings td{font-family:var(--body);font-size:13.5px;text-align:center;padding:9px 8px;border-bottom:1px solid var(--stone-light);}
+  table.standings td:first-child{text-align:left;padding-left:16px;font-family:var(--display);font-weight:700;font-size:15px;text-transform:uppercase;}
+  table.standings td.pts{font-family:var(--display);font-weight:900;font-size:15px;}
+  table.standings tr.us{background:rgba(227,25,50,0.08);}
+  table.standings tr.us td:first-child{color:var(--red);}
+  table.standings tr:last-child td{border-bottom:none;}
+
   footer{background:var(--black);color:var(--stone);padding-top:70px;border-top:1px solid rgba(255,255,255,.1);}
   .foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:40px;padding-bottom:50px;border-bottom:1px solid rgba(255,255,255,.08);}
   .foot-brand{font-family:var(--display);font-size:22px;color:var(--cream);text-transform:uppercase;margin-bottom:10px;}
@@ -138,6 +150,8 @@
       <p style="font-family:var(--mono);font-size:13px;color:var(--stone);">Chargement des matchs en direct…</p>
     </div>
 
+    <div id="standings-container"></div>
+
     <p style="margin-top:30px;font-family:var(--mono);font-size:12px;color:var(--stone);">
       * Données ASF récupérées automatiquement — <a href="https://matchcenter.fvbj-afbj.ch/default.aspx?lng=2&v=1316&oid=6" style="color:var(--red);" target="_blank" rel="noopener">voir le match center complet →</a>
     </p>
@@ -146,6 +160,32 @@
 
 <script>
 let ALL_MATCHES = [];
+let ALL_STANDINGS = {};
+
+function renderStandings(filterCat){
+  const el = document.getElementById('standings-container');
+  const cats = filterCat === 'all' ? Object.keys(ALL_STANDINGS) : (ALL_STANDINGS[filterCat] ? [filterCat] : []);
+
+  if (cats.length === 0) { el.innerHTML = ''; return; }
+
+  let html = '<div class="standings-wrap">';
+  cats.forEach(cat => {
+    const rows = ALL_STANDINGS[cat];
+    html += `<div class="standings-title">Classement — ${cat}</div>`;
+    html += `<table class="standings"><thead><tr>
+      <th>Équipe</th><th>MJ</th><th>V</th><th>N</th><th>D</th><th>BP</th><th>BC</th><th>Diff</th><th>Pts</th>
+    </tr></thead><tbody>`;
+    rows.forEach(r => {
+      html += `<tr class="${r.isUs ? 'us' : ''}">
+        <td>${r.team}</td><td>${r.played}</td><td>${r.won}</td><td>${r.drawn}</td><td>${r.lost}</td>
+        <td>${r.goalsFor}</td><td>${r.goalsAgainst}</td><td>${r.diff}</td><td class="pts">${r.points}</td>
+      </tr>`;
+    });
+    html += `</tbody></table>`;
+  });
+  html += '</div>';
+  el.innerHTML = html;
+}
 
 function renderMatches(filterCat){
   const el = document.getElementById('live-matches');
@@ -193,7 +233,9 @@ function renderMatches(filterCat){
     const data = await res.json();
     if (data.error || !data.matches || data.matches.length === 0) throw new Error('no data');
     ALL_MATCHES = data.matches;
+    ALL_STANDINGS = data.standings || {};
     renderMatches('all');
+    renderStandings('all');
   } catch (e) {
     el.innerHTML = '<p style="font-family:var(--body);font-size:14px;color:var(--stone);">Impossible de charger les données en direct pour le moment. <a href="https://matchcenter.fvbj-afbj.ch/default.aspx?lng=2&v=1316&oid=6" style="color:var(--red);" target="_blank" rel="noopener">Voir le match center ASF →</a></p>';
   }
@@ -203,6 +245,7 @@ function renderMatches(filterCat){
       document.querySelectorAll('.ts-chip').forEach(c => c.classList.remove('active'));
       chip.classList.add('active');
       renderMatches(chip.dataset.team);
+      renderStandings(chip.dataset.team);
     });
   });
 })();
