@@ -149,46 +149,42 @@ function extractStandings(text: string, isMarkdown: boolean): Record<string, Sta
   const standings: Record<string, StandingRow[]> = {};
   if (!isMarkdown) return standings; // only reliably parseable from the markdown reader output
 
-  for (const { match, label } of CATEGORY_PATTERNS) {
-    // find every occurrence of this category heading, keep the one immediately
-    // followed by a markdown table (the standings block, not the fixtures block)
-    let searchFrom = 0;
-    let tableStart = -1;
-    while (true) {
-      const idx = text.indexOf(match, searchFrom);
-      if (idx === -1) break;
-      const nextChunk = text.slice(idx, idx + 400);
-      if (/\n\s*\|\s*\d\.\s*\|/.test(nextChunk) || /\n\s*\|\s*\|\s*\[/.test(nextChunk)) {
-        tableStart = idx;
+  const rowRe = /(?:\d+\.)?(?:\[([^\]]+)\]\([^)]*\)|\*\*([^*]+)\*\*)\s*(\d+)\s(\d+)\s(\d+)\s(\d+)\((\d+)\)(\d+):(\d+)\s(\d+)\*\*(\d+)\*\*/g;
+
+  // one "Classement avec colonne" marker follows each category's standings table
+  let markerIdx = text.indexOf("Classement avec colonne");
+  while (markerIdx !== -1) {
+    // find which category this table belongs to: nearest heading occurrence before the marker
+    let best: { label: string; idx: number } | null = null;
+    for (const { match, label } of CATEGORY_PATTERNS) {
+      const idx = text.lastIndexOf(match, markerIdx);
+      if (idx !== -1 && (!best || idx > best.idx)) best = { label, idx };
+    }
+    if (best && !standings[best.label]) {
+      const block = text.slice(best.idx, markerIdx);
+      const rows: StandingRow[] = [];
+      let rm: RegExpExecArray | null;
+      rowRe.lastIndex = 0;
+      while ((rm = rowRe.exec(block)) !== null) {
+        const teamRaw = (rm[1] || rm[2] || "").trim();
+        if (!teamRaw) continue;
+        const isUs = /etoile/i.test(teamRaw);
+        rows.push({
+          team: teamRaw,
+          isUs,
+          played: parseInt(rm[3], 10),
+          won: parseInt(rm[4], 10),
+          drawn: parseInt(rm[5], 10),
+          lost: parseInt(rm[6], 10),
+          goalsFor: parseInt(rm[8], 10),
+          goalsAgainst: parseInt(rm[9], 10),
+          diff: parseInt(rm[10], 10),
+          points: parseInt(rm[11], 10)
+        });
       }
-      searchFrom = idx + match.length;
+      if (rows.length > 0) standings[best.label] = rows;
     }
-    if (tableStart === -1) continue;
-
-    const blockEnd = text.indexOf("Classement avec colonne", tableStart);
-    const block = blockEnd !== -1 ? text.slice(tableStart, blockEnd) : text.slice(tableStart, tableStart + 4000);
-
-    const rowRe = /\|\s*(?:\d+\.)?\s*\|\s*(?:\[([^\]]+)\]\([^)]*\)|\*\*([^*]+)\*\*|([^|*]+))\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*\(\d+\)\s*\|\s*(\d+)\s*\|\s*:\s*\|\s*(\d+)\s*\|\s*(-?\d+)\s*\|\s*\*\*(\d+)\*\*/g;
-    let rm: RegExpExecArray | null;
-    const rows: StandingRow[] = [];
-    while ((rm = rowRe.exec(block)) !== null) {
-      const teamRaw = (rm[1] || rm[2] || rm[3] || "").trim();
-      if (!teamRaw) continue;
-      const isUs = /etoile/i.test(teamRaw) || !!rm[2];
-      rows.push({
-        team: teamRaw,
-        isUs,
-        played: parseInt(rm[4], 10),
-        won: parseInt(rm[5], 10),
-        drawn: parseInt(rm[6], 10),
-        lost: parseInt(rm[7], 10),
-        goalsFor: parseInt(rm[8], 10),
-        goalsAgainst: parseInt(rm[9], 10),
-        diff: parseInt(rm[10], 10),
-        points: parseInt(rm[11], 10)
-      });
-    }
-    if (rows.length > 0) standings[label] = rows;
+    markerIdx = text.indexOf("Classement avec colonne", markerIdx + 1);
   }
 
   return standings;
