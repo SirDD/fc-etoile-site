@@ -200,9 +200,10 @@ export default async (req: Request, context: Context) => {
 
     const url = new URL(req.url);
     if (url.searchParams.get("raw") === "1") {
-      // temporary debug mode — returns a slice of the raw content around the first standings table
-      const anchor = content.indexOf("4e ligue");
-      const snippet = anchor !== -1 ? content.slice(anchor, anchor + 2500) : content.slice(0, 2500);
+      // temporary debug mode — returns the raw text right around the first standings table
+      const anchor = content.indexOf("Classement avec colonne");
+      const start = anchor !== -1 ? Math.max(0, anchor - 2200) : 0;
+      const snippet = content.slice(start, start + 2400);
       return new Response(snippet, { headers: { "Content-Type": "text/plain; charset=utf-8" } });
     }
 
