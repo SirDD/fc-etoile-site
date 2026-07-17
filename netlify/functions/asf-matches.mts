@@ -12,6 +12,41 @@ const CATEGORIES = [
 ];
 
 const SOURCE_URL = "https://matchcenter.fvbj-afbj.ch/default.aspx?v=1316&oid=6&lng=2&a=rr";
+const WIDGET_URL = "https://widget.football.ch/Widgets.aspx/v-1316/a-rr/";
+const PROXY_URL = "https://api.allorigins.win/raw?url=" + encodeURIComponent(SOURCE_URL);
+
+const BROWSER_HEADERS = {
+  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+  "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+  "Accept-Language": "fr-CH,fr;q=0.9,en;q=0.8,de;q=0.7",
+  "Referer": "https://matchcenter.fvbj-afbj.ch/"
+};
+
+async function fetchFirstWorking(): Promise<{ html: string; usedSource: string }> {
+  const attempts: { url: string; label: string }[] = [
+    { url: WIDGET_URL, label: "widget.football.ch" },
+    { url: SOURCE_URL, label: "matchcenter direct" },
+    { url: PROXY_URL, label: "matchcenter via proxy" }
+  ];
+  const errors: string[] = [];
+  for (const attempt of attempts) {
+    try {
+      const res = await fetch(attempt.url, { headers: BROWSER_HEADERS });
+      if (!res.ok) {
+        errors.push(`${attempt.label}: HTTP ${res.status}`);
+        continue;
+      }
+      const html = await res.text();
+      if (html && html.length > 500) {
+        return { html, usedSource: attempt.label };
+      }
+      errors.push(`${attempt.label}: réponse trop courte`);
+    } catch (e) {
+      errors.push(`${attempt.label}: ${String(e)}`);
+    }
+  }
+  throw new Error("Toutes les sources ont échoué — " + errors.join(" | "));
+}
 
 interface MatchInfo {
   date: string | null;
@@ -34,16 +69,7 @@ function findNearestCategoryBefore(html: string, pos: number): string | null {
 
 export default async (req: Request, context: Context) => {
   try {
-    const res = await fetch(SOURCE_URL, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-        "Accept-Language": "fr-CH,fr;q=0.9,en;q=0.8,de;q=0.7",
-        "Referer": "https://matchcenter.fvbj-afbj.ch/"
-      }
-    });
-    if (!res.ok) throw new Error(`Réponse ASF: ${res.status}`);
-    const html = await res.text();
+    const { html, usedSource } = await fetchFirstWorking();
 
     // collect date marker positions (e.g. "Sa 15.08.2026")
     const dateRe = /(?:Lu|Ma|Me|Je|Ve|Sa|Di)\s\d{2}\.\d{2}\.\d{4}/g;
@@ -88,7 +114,7 @@ export default async (req: Request, context: Context) => {
     }
 
     return new Response(
-      JSON.stringify({ updatedAt: new Date().toISOString(), source: SOURCE_URL, matches }),
+      JSON.stringify({ updatedAt: new Date().toISOString(), usedSource, matches }),
       { headers: { "Content-Type": "application/json", "Cache-Control": "public, max-age=1800" } }
     );
   } catch (err) {
