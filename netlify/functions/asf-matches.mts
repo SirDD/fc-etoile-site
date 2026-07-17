@@ -132,14 +132,90 @@ function extractMatches(text: string, isMarkdown: boolean): MatchInfo[] {
   return matches;
 }
 
+interface StandingRow {
+  team: string;
+  isUs: boolean;
+  played: number;
+  won: number;
+  drawn: number;
+  lost: number;
+  goalsFor: number;
+  goalsAgainst: number;
+  diff: number;
+  points: number;
+}
+
+function extractStandings(text: string, isMarkdown: boolean): Record<string, StandingRow[]> {
+  const standings: Record<string, StandingRow[]> = {};
+  if (!isMarkdown) return standings; // only reliably parseable from the markdown reader output
+
+  for (const { match, label } of CATEGORY_PATTERNS) {
+    // find every occurrence of this category heading, keep the one immediately
+    // followed by a markdown table (the standings block, not the fixtures block)
+    let searchFrom = 0;
+    let tableStart = -1;
+    while (true) {
+      const idx = text.indexOf(match, searchFrom);
+      if (idx === -1) break;
+      const nextChunk = text.slice(idx, idx + 400);
+      if (/\n\s*\|\s*\d\.\s*\|/.test(nextChunk) || /\n\s*\|\s*\|\s*\[/.test(nextChunk)) {
+        tableStart = idx;
+      }
+      searchFrom = idx + match.length;
+    }
+    if (tableStart === -1) continue;
+
+    const blockEnd = text.indexOf("Classement avec colonne", tableStart);
+    const block = blockEnd !== -1 ? text.slice(tableStart, blockEnd) : text.slice(tableStart, tableStart + 4000);
+
+    const rowRe = /\|\s*(?:\d+\.)?\s*\|\s*(?:\[([^\]]+)\]\([^)]*\)|\*\*([^*]+)\*\*|([^|*]+))\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*\(\d+\)\s*\|\s*(\d+)\s*\|\s*:\s*\|\s*(\d+)\s*\|\s*(-?\d+)\s*\|\s*\*\*(\d+)\*\*/g;
+    let rm: RegExpExecArray | null;
+    const rows: StandingRow[] = [];
+    while ((rm = rowRe.exec(block)) !== null) {
+      const teamRaw = (rm[1] || rm[2] || rm[3] || "").trim();
+      if (!teamRaw) continue;
+      const isUs = /etoile/i.test(teamRaw) || !!rm[2];
+      rows.push({
+        team: teamRaw,
+        isUs,
+        played: parseInt(rm[4], 10),
+        won: parseInt(rm[5], 10),
+        drawn: parseInt(rm[6], 10),
+        lost: parseInt(rm[7], 10),
+        goalsFor: parseInt(rm[8], 10),
+        goalsAgainst: parseInt(rm[9], 10),
+        diff: parseInt(rm[10], 10),
+        points: parseInt(rm[11], 10)
+      });
+    }
+    if (rows.length > 0) standings[label] = rows;
+  }
+
+  return standings;
+}
+
 export default async (req: Request, context: Context) => {
   try {
     const { content, usedSource, isMarkdown } = await fetchFirstWorking();
     const matches = extractMatches(content, isMarkdown);
 
+    let standings: Record<string, StandingRow[]> = {};
+    try {
+      standings = extractStandings(content, isMarkdown);
+    } catch (e) {
+      // standings are a bonus — never let a parsing issue break the matches response
+      standings = {};
+    }
+
     return new Response(
-      JSON.stringify({ updatedAt: new Date().toISOString(), usedSource, matchCount: matches.length, matches }),
-      { headers: { "Content-Type": "application/json", "Cache-Control": "public, max-age=1800" } }
+      JSON.stringify({
+        updatedAt: new Date().toISOString(),
+        usedSource,
+        matchCount: matches.length,
+        matches,
+        standings
+      }),
+      { headers: { "Content-Type": "application/json", "Cache-Control": "public, max-age=120" } }
     );
   } catch (err) {
     return new Response(
