@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FC Étoile Biel-Bienne — Un club. Une passion. Une famille.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700;900&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#E31932;--red-dark:#7E0F1E;--black:#0A0909;--black-soft:#161514;
+    --cream:#F6F3EC;--stone:#8B887E;--stone-light:#D8D4C8;--gold:#C79A3F;
+    --display:'Big Shoulders Display',sans-serif;--body:'Source Sans 3',sans-serif;--mono:'IBM Plex Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--cream);color:var(--black);font-family:var(--body);line-height:1.6;overflow-x:hidden;cursor:none;}
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 32px;}
+  ::selection{background:var(--red);color:var(--cream);}
+  #cursor{position:fixed;top:0;left:0;width:16px;height:16px;border-radius:50%;background:var(--red);pointer-events:none;z-index:999;transform:translate(-50%,-50%);transition:width .25s,height .25s,background .25s;mix-blend-mode:difference;}
+  #cursor.big{width:56px;height:56px;background:var(--cream);}
+  #cursor-trail{position:fixed;top:0;left:0;width:36px;height:36px;border-radius:50%;border:1px solid rgba(227,25,50,0.5);pointer-events:none;z-index:998;transform:translate(-50%,-50%);transition:width .3s,height .3s,opacity .3s;}
+  #cursor-trail.big{width:80px;height:80px;opacity:0.5;}
+  @media(max-width:900px){#cursor,#cursor-trail{display:none;}body{cursor:auto;}}
+
+  .tilt-card{transform-style:preserve-3d;transition:transform .15s ease-out,box-shadow .3s;will-change:transform;position:relative;overflow:hidden;}
+  .tilt-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,0.14),transparent 60%);opacity:0;transition:opacity .3s;pointer-events:none;z-index:2;}
+  .tilt-card:hover::before{opacity:1;}
+  .tilt-card:hover{box-shadow:0 20px 45px rgba(0,0,0,0.35);}
+  .magnetic{display:inline-flex;transition:transform .2s cubic-bezier(.2,.8,.2,1);}
+
+  #scroll-ball{position:fixed;top:0;right:28px;width:46px;height:46px;z-index:70;pointer-events:none;filter:drop-shadow(0 10px 18px rgba(0,0,0,0.35));will-change:transform;}
+  @media(max-width:760px){#scroll-ball{width:32px;height:32px;right:14px;}}
+
+  #goal-text{position:absolute;top:-6px;right:26px;font-family:var(--display);font-weight:900;font-size:44px;color:var(--red);text-transform:uppercase;letter-spacing:1px;opacity:0;transform:scale(0.4) rotate(-6deg);transition:opacity .35s ease,transform .5s cubic-bezier(.2,1.6,.4,1);pointer-events:none;z-index:71;text-shadow:0 0 24px rgba(227,25,50,0.6);}
+  #goal-text.show{opacity:1;transform:scale(1) rotate(-4deg);}
+  #fireworks{position:absolute;top:14px;right:50px;width:150px;height:140px;pointer-events:none;z-index:69;}
+  .spark{position:absolute;top:50%;left:50%;width:6px;height:6px;border-radius:50%;opacity:0;}
+  .spark.fire{animation:sparkFly .9s ease-out forwards;}
+  @keyframes sparkFly{
+    0%{opacity:1;transform:translate(-50%,-50%) scale(1);}
+    100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(0.3);}
+  }
+  @media(max-width:760px){#goal-text{font-size:28px;right:14px;}#fireworks{right:20px;width:100px;}}
+
+  header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,9,9,0.88);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,0.08);transition:padding .3s;}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;max-width:1200px;margin:0 auto;transition:padding .3s;}
+  header.shrink nav{padding:12px 32px;}
+  .brand{display:flex;align-items:center;gap:12px;font-family:var(--display);color:var(--cream);font-size:20px;font-weight:700;letter-spacing:.5px;}
+  .brand svg{width:28px;height:28px;flex-shrink:0;}
+  .navlinks{display:flex;gap:32px;align-items:center;}
+  .navlinks a{position:relative;color:var(--stone-light);font-size:12.5px;letter-spacing:1.4px;text-transform:uppercase;font-weight:600;padding-bottom:4px;}
+  .navlinks a.active{color:var(--red);}
+  .navlinks a::after{content:'';position:absolute;left:0;bottom:0;width:0;height:2px;background:var(--red);transition:width .25s;}
+  .navlinks a:hover::after{width:100%;}
+  .navlinks .cta{background:var(--red);color:var(--cream);padding:9px 18px;border-radius:2px;}
+  .navlinks .cta::after{display:none;}
+  .langs{display:flex;gap:6px;margin-left:6px;}
+  .langs a{background:none;border:1px solid rgba(255,255,255,.25);color:var(--stone-light);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:2px;cursor:pointer;}
+  .langs a.active,.langs a:hover{border-color:var(--red);color:var(--cream);background:var(--red);}
+  @media(max-width:940px){.navlinks a:not(.cta){display:none;}}
+
+  .hero{position:relative;min-height:100svh;background:var(--black);color:var(--cream);display:flex;flex-direction:column;justify-content:center;overflow:hidden;}
+  .beams{position:absolute;inset:-20%;background:conic-gradient(from 0deg at 25% 20%, transparent 0deg, rgba(227,25,50,0.14) 8deg, transparent 20deg, transparent 340deg, rgba(227,25,50,0.1) 352deg, transparent 360deg);animation:sweep 26s linear infinite;z-index:0;}
+  @keyframes sweep{to{transform:rotate(360deg);}}
+  .grain{position:absolute;inset:0;opacity:.05;z-index:1;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+  .hero-crest{position:absolute;right:6%;top:50%;transform:translateY(-50%);width:420px;height:420px;opacity:.5;z-index:1;animation:pulse 5s ease-in-out infinite;}
+  .hero-crest path{stroke:var(--red);fill:none;stroke-width:.6;}
+  @keyframes pulse{0%,100%{opacity:.35;}50%{opacity:.6;}}
+  .hero-inner{max-width:1200px;margin:0 auto;width:100%;padding:150px 32px 0;position:relative;z-index:2;}
+  .eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:10px;opacity:0;animation:fadeUp .7s ease forwards .1s;}
+  .eyebrow::before{content:'';width:28px;height:1px;background:var(--gold);}
+  h1.headline{font-family:var(--display);font-weight:900;font-size:clamp(58px,10vw,152px);line-height:.86;letter-spacing:-2px;text-transform:uppercase;max-width:980px;}
+  h1.headline span{display:block;overflow:hidden;}
+  h1.headline b{display:block;opacity:0;transform:translateY(115%) skewY(4deg);animation:fadeUp .85s cubic-bezier(.2,.8,.2,1) forwards;}
+  h1.headline b.r1{animation-delay:.1s;}
+  h1.headline b.r2{animation-delay:.24s;}
+  h1.headline b.r3{animation-delay:.38s;color:transparent;-webkit-text-stroke:2px var(--red);}
+  @keyframes fadeUp{to{opacity:1;transform:translateY(0) skewY(0);}}
+  .hero-sub{margin-top:30px;max-width:440px;font-size:16px;color:var(--stone-light);opacity:0;animation:fadeUp .7s ease forwards .58s;}
+  .hero-actions{margin-top:36px;display:flex;gap:16px;flex-wrap:wrap;opacity:0;animation:fadeUp .7s ease forwards .72s;}
+  .btn{font-family:var(--mono);font-size:13px;letter-spacing:1px;text-transform:uppercase;padding:15px 26px;border-radius:2px;display:inline-flex;align-items:center;gap:10px;transition:transform .25s,background .25s;}
+  .btn-primary{background:var(--cream);color:var(--black);}
+  .btn-primary:hover{background:var(--gold);transform:translateY(-2px);}
+  .btn-ghost{border:1px solid rgba(255,255,255,.3);color:var(--cream);}
+  .btn-ghost:hover{border-color:var(--cream);background:rgba(255,255,255,.06);}
+
+  /* match center strip */
+  .matchcenter{position:relative;z-index:2;margin-top:64px;padding:0 32px 0;opacity:0;animation:fadeUp .7s ease forwards .86s;}
+  .mc-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:rgba(255,255,255,.08);}
+  .mc-card{background:var(--black-soft);padding:26px 30px;}
+  .mc-label{font-family:var(--mono);font-size:11px;color:var(--stone);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;}
+  .mc-teams{display:flex;align-items:center;justify-content:space-between;gap:16px;}
+  .mc-team{font-family:var(--display);font-weight:700;font-size:20px;text-transform:uppercase;}
+  .mc-score{font-family:var(--display);font-weight:900;font-size:30px;color:var(--red);}
+  .cd-row{display:flex;gap:22px;margin-top:16px;}
+  .cd-unit{display:flex;flex-direction:column;}
+  .cd-num{font-family:var(--display);font-weight:900;font-size:32px;color:var(--cream);line-height:1;}
+  .cd-txt{font-family:var(--mono);font-size:9.5px;color:var(--stone);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;}
+  @media(max-width:760px){.mc-grid{grid-template-columns:1fr;}}
+
+  .marquee{position:relative;z-index:2;margin-top:40px;background:var(--red);border-top:1px solid rgba(0,0,0,.15);overflow:hidden;padding:14px 0;}
+  .marquee-track{display:flex;white-space:nowrap;animation:scroll 22s linear infinite;}
+  .marquee-track span{font-family:var(--display);font-weight:700;font-size:19px;text-transform:uppercase;color:var(--cream);letter-spacing:1px;padding:0 26px;display:flex;align-items:center;gap:26px;}
+  .marquee-track span::after{content:'★';font-size:13px;color:rgba(255,255,255,.6);}
+  @keyframes scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  section{padding:130px 0;}
+  .section-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:60px;gap:24px;flex-wrap:wrap;}
+  .section-num{font-family:var(--mono);font-size:13px;color:var(--red);letter-spacing:2px;margin-bottom:14px;}
+  h2.section-title{font-family:var(--display);font-weight:900;font-size:clamp(34px,4.8vw,60px);text-transform:uppercase;line-height:.96;letter-spacing:-.5px;}
+  .section-desc{max-width:360px;color:var(--stone);font-size:15px;}
+  .section-link{font-family:var(--mono);font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--red);border-bottom:1px solid var(--red);padding-bottom:2px;}
+
+  .stats{background:var(--black-soft);}
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);}
+  .stat{padding:52px 32px;border-right:1px solid rgba(255,255,255,0.08);}
+  .stat:last-child{border-right:none;}
+  .stat .num{font-family:var(--display);font-weight:900;font-size:56px;color:var(--cream);line-height:1;}
+  .stat .lbl{font-family:var(--mono);font-size:11.5px;color:var(--stone);letter-spacing:1.5px;text-transform:uppercase;margin-top:10px;}
+  @media(max-width:760px){.stats-grid{grid-template-columns:repeat(2,1fr);}.stat{border-bottom:1px solid rgba(255,255,255,0.08);}}
+
+  .manifesto{background:var(--cream);min-height:240vh;position:relative;}
+  .manifesto-sticky{position:sticky;top:0;height:100svh;display:flex;align-items:center;overflow:hidden;}
+  .manifesto-text{font-family:var(--display);font-weight:900;font-size:clamp(30px,5.4vw,68px);line-height:1.12;text-transform:uppercase;letter-spacing:-.5px;max-width:980px;padding:0 32px;}
+  .manifesto-text .w{color:var(--stone-light);transition:color .25s;}
+  .manifesto-text .w.hit{color:var(--black);}
+  .manifesto-text .w.red{color:var(--red);}
+
+  .recruit{background:var(--red);color:var(--cream);position:relative;overflow:hidden;padding:150px 0;}
+  .recruit-stripes{position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(0,0,0,.08) 0 2px,transparent 2px 46px);z-index:0;}
+  .recruit .wrap{position:relative;z-index:2;}
+  .recruit-eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:18px;}
+  .recruit h2{font-family:var(--display);font-weight:900;font-size:clamp(42px,7.4vw,96px);line-height:.92;text-transform:uppercase;letter-spacing:-1px;max-width:860px;}
+  .recruit p.desc{margin-top:26px;max-width:520px;font-size:18px;color:rgba(255,255,255,.92);}
+  .recruit-actions{margin-top:44px;display:flex;gap:16px;flex-wrap:wrap;}
+  .recruit .btn-primary{background:var(--black);color:var(--cream);}
+  .recruit .btn-primary:hover{background:var(--black-soft);}
+  .recruit .btn-ghost{border-color:rgba(255,255,255,.5);}
+
+  .history{background:var(--black);color:var(--cream);}
+  .history .section-desc{color:var(--stone-light);}
+  .h-track{display:flex;gap:2px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:20px;}
+  .h-track::-webkit-scrollbar{height:6px;}
+  .h-track::-webkit-scrollbar-thumb{background:var(--red);}
+  .h-card{scroll-snap-align:start;flex:0 0 300px;background:var(--black-soft);padding:24px 24px 28px;min-height:280px;display:flex;flex-direction:column;justify-content:flex-end;gap:0;}
+  .h-photo{width:100%;height:110px;border:1px dashed rgba(255,255,255,.2);border-radius:2px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--stone);letter-spacing:1px;text-transform:uppercase;margin-bottom:18px;}
+  .h-year{font-family:var(--display);font-weight:900;font-size:44px;color:var(--red);}
+  .h-txt{font-size:14.5px;color:var(--stone-light);margin-top:14px;}
+
+  .comite-teaser{background:var(--black-soft);color:var(--cream);}
+  .comite-teaser .section-desc{color:var(--stone-light);}
+  .lead-row{display:flex;gap:2px;}
+  .lead-card{flex:1;background:var(--red);color:var(--cream);padding:34px 30px;position:relative;overflow:hidden;transition:transform .3s;}
+  .lead-card:hover{transform:translateY(-4px);}
+  .lead-card:nth-child(2){background:var(--red-dark);}
+  .lead-role{font-family:var(--mono);font-size:11.5px;letter-spacing:1.5px;text-transform:uppercase;opacity:.85;}
+  .lead-name{font-family:var(--display);font-size:32px;font-weight:700;margin-top:10px;}
+  @media(max-width:700px){.lead-row{flex-direction:column;}}
+
+  .teams{background:var(--cream);}
+  .team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--stone-light);border:1px solid var(--stone-light);}
+  .team-card{background:var(--cream);padding:36px 28px;transition:background .2s,color .2s;}
+  .team-card:hover{background:var(--black);color:var(--cream);}
+  .team-cat{font-family:var(--mono);font-size:11px;color:var(--red);letter-spacing:1.5px;text-transform:uppercase;}
+  .team-name{font-family:var(--display);font-size:27px;font-weight:700;margin-top:10px;text-transform:uppercase;}
+  @media(max-width:860px){.team-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:560px){.team-grid{grid-template-columns:1fr;}}
+
+  .news{background:var(--black);color:var(--cream);}
+  .news .section-desc{color:var(--stone-light);}
+  .news-list{display:flex;flex-direction:column;}
+  .news-item{display:grid;grid-template-columns:110px 1fr auto;gap:28px;align-items:center;padding:28px 0;border-top:1px solid rgba(255,255,255,.12);transition:padding-left .25s;cursor:pointer;}
+  .news-item:last-child{border-bottom:1px solid rgba(255,255,255,.12);}
+  .news-item:hover{padding-left:14px;}
+  .news-date{font-family:var(--mono);font-size:12px;color:var(--stone);}
+  .news-title{font-family:var(--display);font-size:22px;font-weight:700;text-transform:uppercase;}
+  .news-tag{font-family:var(--mono);font-size:11px;color:var(--red);border:1px solid var(--red);padding:4px 10px;white-space:nowrap;}
+  @media(max-width:700px){.news-item{grid-template-columns:1fr;gap:8px;}.news-tag{width:fit-content;}}
+
+  .sponsors{background:var(--cream);padding:90px 0;overflow:hidden;}
+  .sp-track{display:flex;white-space:nowrap;animation:scroll 30s linear infinite;}
+  .sp-track span{font-family:var(--display);font-weight:700;font-size:30px;color:var(--stone);letter-spacing:1px;padding:0 44px;text-transform:uppercase;opacity:.6;}
+
+  .contact{background:var(--black-soft);color:var(--cream);}
+  .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;}
+  .contact-block h3{font-family:var(--display);font-size:21px;text-transform:uppercase;margin-bottom:16px;color:var(--stone-light);}
+  .contact-block p{color:var(--stone);font-size:15px;margin-bottom:6px;}
+  .social-row{display:flex;gap:14px;margin-top:20px;}
+  .social-row a{border:1px solid rgba(255,255,255,.25);width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-family:var(--mono);font-size:11px;transition:all .2s;}
+  .social-row a:hover{border-color:var(--red);background:var(--red);}
+  @media(max-width:760px){.contact-grid{grid-template-columns:1fr;gap:40px;}}
+
+  footer{background:var(--black);color:var(--stone);padding-top:70px;border-top:1px solid rgba(255,255,255,.1);}
+  .foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:40px;padding-bottom:50px;border-bottom:1px solid rgba(255,255,255,.08);}
+  .foot-brand{font-family:var(--display);font-size:22px;color:var(--cream);text-transform:uppercase;margin-bottom:10px;}
+  .foot-tagline{font-size:14px;color:var(--stone);max-width:260px;}
+  .foot-col h4{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--stone-light);margin-bottom:16px;}
+  .foot-col a{display:block;font-size:14px;color:var(--stone);margin-bottom:10px;transition:color .2s;}
+  .foot-col a:hover{color:var(--cream);}
+  .foot-bottom{display:flex;justify-content:space-between;align-items:center;padding:26px 0;flex-wrap:wrap;gap:10px;}
+  .foot-meta{font-family:var(--mono);font-size:11px;color:var(--stone);}
+  @media(max-width:860px){.foot-grid{grid-template-columns:1fr 1fr;}}
+
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease;}
+  .reveal.in{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+<div id="cursor"></div>
+<div id="cursor-trail"></div>
+
+<svg id="scroll-ball" viewBox="0 0 100 100">
+  <defs>
+    <radialGradient id="ballShade" cx="35%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="55%" stop-color="#F1EEE5"/>
+      <stop offset="100%" stop-color="#B9B4A6"/>
+    </radialGradient>
+  </defs>
+  <circle cx="50" cy="50" r="47" fill="url(#ballShade)" stroke="#0A0909" stroke-width="1.6"/>
+  <polygon points="50,37 62.4,46 57.6,60.5 42.4,60.5 37.6,46" fill="#0A0909"/>
+  <g stroke="#0A0909" stroke-width="2" fill="none" stroke-linecap="round">
+    <path d="M50,37 L50,12"/>
+    <path d="M62.4,46 L86.1,38.3"/>
+    <path d="M57.6,60.5 L72.3,80.7"/>
+    <path d="M42.4,60.5 L27.7,80.7"/>
+    <path d="M37.6,46 L13.9,38.3"/>
+  </g>
+  <g fill="#0A0909">
+    <polygon points="50,5 56.66,9.84 54.11,17.66 45.89,17.66 43.34,9.84"/>
+    <polygon points="86.1,31.3 92.76,36.14 90.21,43.96 81.99,43.96 79.44,36.14"/>
+    <polygon points="72.3,73.7 78.96,78.54 76.41,86.36 68.19,86.36 65.64,78.54"/>
+    <polygon points="27.7,73.7 34.36,78.54 31.81,86.36 23.59,86.36 21.04,78.54"/>
+    <polygon points="13.9,31.3 20.56,36.14 18.01,43.96 9.79,43.96 7.24,36.14"/>
+  </g>
+  <circle cx="50" cy="50" r="47" fill="none" stroke="#0A0909" stroke-width="1.6"/>
+</svg>
+
+<header id="site-header">
+  <nav>
+    <a href="index.html" class="brand">
+      <svg viewBox="0 0 100 100"><path fill="#E31932" d="M50 4 L61 36 L96 36 L68 57 L79 90 L50 70 L21 90 L32 57 L4 36 L39 36 Z"/></svg>
+      FC Étoile Biel-Bienne
+    </a>
+    <div class="navlinks">
+      <a href="index.html" class="active">Accueil</a>
+      <a href="club.html">Club</a>
+      <a href="#equipes">Équipes</a>
+      <a href="calendrier.html">Calendrier</a>
+      <a href="actualites.html">Actualités</a>
+      <a href="boutique.html">Boutique</a>
+      <a href="tv.html">Étoile TV</a>
+      <a href="#contact" class="cta">Nous rejoindre</a>
+<div class="langs"><a class="active" href="index.html">FR</a><a href="de/index.html">DE</a><a href="en/index.html">EN</a></div>
+    </div>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="beams"></div>
+  <div class="grain"></div>
+  <canvas id="hero-3d" style="position:absolute;inset:0;z-index:1;"></canvas>
+  <svg class="hero-crest" viewBox="0 0 100 100"><path d="M50 4 L61 36 L96 36 L68 57 L79 90 L50 70 L21 90 L32 57 L4 36 L39 36 Z"/></svg>
+  <div class="hero-inner">
+    <div class="eyebrow">Biel/Bienne · Depuis 1967</div>
+    <h1 class="headline">
+      <span><b class="r1">Entre</b></span>
+      <span><b class="r2">dans</b></span>
+      <span><b class="r3">l'étoile.</b></span>
+    </h1>
+    <p class="hero-sub">Depuis 1967, le noir et le rouge portent les couleurs du FC Étoile Biel-Bienne. Sept équipes, un seul club, une famille.</p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn btn-primary magnetic" data-hover>Rejoindre le club →</a>
+      <a href="club.html" class="btn btn-ghost magnetic" data-hover>Découvrir le club</a>
+    </div>
+  </div>
+
+  <div class="matchcenter">
+    <div class="wrap">
+      <div class="mc-grid">
+        <div class="mc-card">
+          <div class="mc-label">Saison 2026/27</div>
+          <div class="mc-teams">
+            <div class="mc-team" style="font-size:16px;color:var(--stone-light);text-transform:none;font-family:var(--body);font-weight:400;">Coup d'envoi le 16 août — aucun résultat pour l'instant</div>
+          </div>
+        </div>
+        <div class="mc-card">
+          <div class="mc-label">Prochain coup d'envoi — FC Étoile Biel vs FC Nidau</div>
+          <div class="cd-row">
+            <div class="cd-unit"><div class="cd-num" id="cd-d">00</div><div class="cd-txt">Jours</div></div>
+            <div class="cd-unit"><div class="cd-num" id="cd-h">00</div><div class="cd-txt">Heures</div></div>
+            <div class="cd-unit"><div class="cd-num" id="cd-m">00</div><div class="cd-txt">Min</div></div>
+            <div class="cd-unit"><div class="cd-num" id="cd-s">00</div><div class="cd-txt">Sec</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="marquee">
+    <div class="marquee-track">
+      <span>Saison 2026/27</span><span>On recrute joueurs</span><span>FC Étoile Biel-Bienne</span><span>Depuis 1967</span>
+      <span>Saison 2026/27</span><span>On recrute joueurs</span><span>FC Étoile Biel-Bienne</span><span>Depuis 1967</span>
+    </div>
+  </div>
+</section>
+
+<section class="stats reveal">
+  <div class="wrap stats-grid">
+    <div class="stat"><div class="num" data-count="1967">0</div><div class="lbl">Fondation</div></div>
+    <div class="stat"><div class="num" data-count="7">0</div><div class="lbl">Équipes en compétition</div></div>
+    <div class="stat"><div class="num" data-count="59">0</div><div class="lbl">Ans d'histoire</div></div>
+    <div class="stat"><div class="num">★</div><div class="lbl">Un club, une famille</div></div>
+  </div>
+</section>
+
+<section class="manifesto">
+  <div class="manifesto-sticky">
+    <div class="wrap">
+      <p class="manifesto-text" id="manifesto">
+        <span class="w">Un</span> <span class="w">club</span> <span class="w">ne</span> <span class="w">se</span> <span class="w">résume</span> <span class="w">pas</span> <span class="w">à</span> <span class="w">un</span> <span class="w">classement.</span>
+        <span class="w red">Ce</span> <span class="w red">sont</span> <span class="w red">des</span> <span class="w red">générations</span>
+        <span class="w">entières</span> <span class="w">qui</span> <span class="w">portent</span> <span class="w">le</span> <span class="w">même</span> <span class="w">maillot,</span>
+        <span class="w">un</span> <span class="w">terrain</span> <span class="w">qui</span> <span class="w">devient</span> <span class="w">deuxième</span> <span class="w">maison,</span>
+        <span class="w red">et</span> <span class="w red">une</span> <span class="w red">étoile</span> <span class="w red">qui</span> <span class="w red">ne</span> <span class="w red">s'éteint</span> <span class="w red">jamais.</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="recruit" id="recrutement">
+  <div class="recruit-stripes"></div>
+  <div class="wrap">
+    <div class="recruit-eyebrow">Toutes catégories, tous niveaux</div>
+    <h2>Ta place<br>t'attend sur<br>le terrain.</h2>
+    <p class="desc">Juniors, seniors, vétérans, arbitres, bénévoles — le FC Étoile grandit et cherche du monde pour porter le maillot et faire vivre le club. Aucune expérience requise pour aimer ce club, juste l'envie.</p>
+    <div class="recruit-actions">
+      <a href="#contact" class="btn btn-primary magnetic" data-hover>Je veux essayer →</a>
+      <a href="#equipes" class="btn btn-ghost magnetic" data-hover>Voir les équipes</a>
+    </div>
+  </div>
+</section>
+
+<section class="history reveal">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="section-num">01 — Depuis 1967</div>
+        <h2 class="section-title">Notre histoire</h2>
+      </div>
+      <a href="club.html" class="section-link">Toute l'histoire du club →</a>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="h-track">
+      <div class="h-card"><div class="h-photo">Photo à venir</div><div class="h-year">1967</div><div class="h-txt">Fondation du FC Étoile Biel-Bienne.</div></div>
+      <div class="h-card"><div class="h-photo">Photo à venir</div><div class="h-year">1970s—90s</div><div class="h-txt">Le club grandit saison après saison, génération après génération.</div></div>
+      <div class="h-card"><div class="h-photo">Photo à venir</div><div class="h-year">2020s</div><div class="h-txt">Sept équipes actives, des Juniors G à la 4e ligue, portent aujourd'hui les couleurs du club.</div></div>
+      <div class="h-card"><div class="h-photo">Photo à venir</div><div class="h-year">2026</div><div class="h-txt">Le comité actuel poursuit le travail des générations précédentes.</div></div>
+      <div class="h-card" style="background:var(--red);"><div class="h-year" style="color:var(--black);">→</div><div class="h-txt" style="color:rgba(255,255,255,.9);">La prochaine page de l'histoire s'écrit avec toi.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="comite-teaser reveal">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="section-num" style="color:var(--red)">02 — Organisation</div>
+        <h2 class="section-title">Le comité</h2>
+      </div>
+      <a href="club.html#comite" class="section-link">Voir tout le comité →</a>
+    </div>
+    <div class="lead-row">
+      <div class="lead-card tilt-card"><div class="lead-role">Président</div><div class="lead-name">Nassir</div></div>
+      <div class="lead-card tilt-card"><div class="lead-role">Vice-Président</div><div class="lead-name">Anthony</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="teams reveal" id="equipes">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="section-num">03 — Effectifs</div>
+        <h2 class="section-title">Nos équipes</h2>
+      </div>
+      <p class="section-desc">Des Juniors G à la 4e ligue, 7 équipes portent les couleurs du club, licenciées ASF/AFBJ.</p>
+    </div>
+    <div class="team-grid">
+      <div class="team-card tilt-card"><div class="team-cat">Seniors</div><div class="team-name">4e ligue</div></div>
+      <div class="team-card tilt-card"><div class="team-cat">Seniors</div><div class="team-name">5e ligue b</div></div>
+      <div class="team-card tilt-card"><div class="team-cat">Vétérans</div><div class="team-name">Seniors 30+</div></div>
+      <div class="team-card tilt-card"><div class="team-cat">Juniors</div><div class="team-name">Juniors D-9</div></div>
+      <div class="team-card tilt-card"><div class="team-cat">Juniors</div><div class="team-name">Juniors E a</div></div>
+      <div class="team-card tilt-card"><div class="team-cat">Juniors</div><div class="team-name">Juniors F</div></div>
+      <div class="team-card tilt-card"><div class="team-cat">Juniors</div><div class="team-name">Juniors G</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="news reveal">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="section-num">04 — Actualités</div>
+        <h2 class="section-title">Dernières nouvelles</h2>
+      </div>
+      <a href="actualites.html" class="section-link">Toutes les actualités →</a>
+    </div>
+    <div class="news-list">
+      <div class="news-item"><div class="news-date">14.07.2026</div><div class="news-title">Le nouveau comité est en place</div><div class="news-tag">Club</div></div>
+      <div class="news-item"><div class="news-date">30.06.2026</div><div class="news-title">Bilan de la saison 2025/26</div><div class="news-tag">Sportif</div></div>
+      <div class="news-item"><div class="news-date">12.06.2026</div><div class="news-title">Tournoi juniors du club</div><div class="news-tag">Juniors</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sponsors reveal">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="section-num">05 — Partenaires</div>
+        <h2 class="section-title">Nos sponsors</h2>
+      </div>
+    </div>
+  </div>
+  <div class="sp-track">
+    <span>Suissenano</span><span>Losteria</span><span>Cash Converters</span><span>Glas Trösch</span><span>Future Corner</span><span>Ville de Biel/Bienne</span>
+    <span>Suissenano</span><span>Losteria</span><span>Cash Converters</span><span>Glas Trösch</span><span>Future Corner</span><span>Ville de Biel/Bienne</span>
+  </div>
+</section>
+
+<section class="contact reveal" id="contact">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="section-num">06 — Contact</div>
+        <h2 class="section-title">Venez nous voir</h2>
+      </div>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-block">
+        <h3>Notre terrain</h3>
+                <p>Case postale 417, 2501 Biel/Bienne</p>
+      </div>
+      <div class="contact-block">
+        <h3>Nous écrire</h3>
+        <p>contact@fcetoilebienne.ch</p>
+        <div class="social-row">
+          <a href="#">FB</a>
+          <a href="#">IG</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer style="position:relative;overflow:hidden;">
+  <svg id="goal-target" viewBox="0 0 200 140" style="position:absolute;top:14px;right:50px;width:150px;height:auto;opacity:0.85;pointer-events:none;">
+    <g stroke="rgba(246,243,236,0.3)" stroke-width="1">
+      <line x1="30" y1="18" x2="30" y2="125"/>
+      <line x1="50" y1="18" x2="50" y2="125"/>
+      <line x1="70" y1="18" x2="70" y2="125"/>
+      <line x1="90" y1="18" x2="90" y2="125"/>
+      <line x1="110" y1="18" x2="110" y2="125"/>
+      <line x1="130" y1="18" x2="130" y2="125"/>
+      <line x1="150" y1="18" x2="150" y2="125"/>
+      <line x1="170" y1="18" x2="170" y2="125"/>
+      <line x1="18" y1="25" x2="182" y2="25"/>
+      <line x1="18" y1="40" x2="182" y2="40"/>
+      <line x1="18" y1="55" x2="182" y2="55"/>
+      <line x1="18" y1="70" x2="182" y2="70"/>
+      <line x1="18" y1="85" x2="182" y2="85"/>
+      <line x1="18" y1="100" x2="182" y2="100"/>
+      <line x1="18" y1="115" x2="182" y2="115"/>
+    </g>
+    <rect x="10" y="10" width="8" height="120" fill="#F6F3EC"/>
+    <rect x="182" y="10" width="8" height="120" fill="#F6F3EC"/>
+    <rect x="10" y="10" width="180" height="8" fill="#F6F3EC"/>
+  </svg>
+
+  <div id="goal-text">BUT !</div>
+  <div id="fireworks"></div>
+
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">FC Étoile Biel-Bienne</div>
+        <p class="foot-tagline">Un club. Une passion. Une famille. Depuis 1967.</p>
+      </div>
+      <div class="foot-col">
+        <h4>Club</h4>
+        <a href="club.html">Histoire</a>
+        <a href="club.html#comite">Comité</a>
+        <a href="#equipes">Équipes</a>
+      </div>
+      <div class="foot-col">
+        <h4>Suivre</h4>
+        <a href="actualites.html">Actualités</a>
+        <a href="#">Résultats</a>
+        <a href="#">Galerie</a>
+      </div>
+      <div class="foot-col">
+        <h4>Nous rejoindre</h4>
+        <a href="#recrutement">Devenir joueur</a>
+        <a href="#contact">Bénévolat</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <div class="foot-meta">© 2026 FC Étoile Biel-Bienne — Depuis 1967</div>
+      <div class="foot-meta">Biel/Bienne</div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+  // --- 3D star field in the hero (Three.js) ---
+  (function initHero3D(){
+    const canvas = document.getElementById('hero-3d');
+    if(!canvas || typeof THREE === 'undefined' || window.innerWidth < 760) return;
+    const heroSection = document.querySelector('.hero');
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, heroSection.clientWidth / heroSection.clientHeight, 1, 2000);
+    camera.position.z = 420;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(heroSection.clientWidth, heroSection.clientHeight);
+
+    const STAR_COUNT = 700;
+    const positions = new Float32Array(STAR_COUNT * 3);
+    const colorsArr = new Float32Array(STAR_COUNT * 3);
+    const palette = [
+      [0.89, 0.10, 0.20], // red
+      [0.78, 0.60, 0.25], // gold
+      [0.96, 0.95, 0.93], // cream
+    ];
+    for (let i = 0; i < STAR_COUNT; i++) {
+      positions[i*3]   = (Math.random() - 0.5) * 1400;
+      positions[i*3+1] = (Math.random() - 0.5) * 900;
+      positions[i*3+2] = (Math.random() - 0.5) * 800;
+      const c = palette[Math.floor(Math.random() * palette.length)];
+      colorsArr[i*3] = c[0]; colorsArr[i*3+1] = c[1]; colorsArr[i*3+2] = c[2];
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colorsArr, 3));
+
+    // build a small sparkle-star texture so each particle reads as a star, not a square
+    function createStarTexture(){
+      const size = 64;
+      const canvas = document.createElement('canvas');
+      canvas.width = size; canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const cx = size / 2, cy = size / 2;
+      const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, size / 2);
+      glow.addColorStop(0, 'rgba(255,255,255,1)');
+      glow.addColorStop(0.22, 'rgba(255,255,255,0.75)');
+      glow.addColorStop(0.55, 'rgba(255,255,255,0.18)');
+      glow.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, size, size);
+      ctx.strokeStyle = 'rgba(255,255,255,0.95)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(cx, 4); ctx.lineTo(cx, size - 4);
+      ctx.moveTo(4, cy); ctx.lineTo(size - 4, cy);
+      ctx.stroke();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+      ctx.beginPath();
+      ctx.moveTo(cx - 14, cy - 14); ctx.lineTo(cx + 14, cy + 14);
+      ctx.moveTo(cx + 14, cy - 14); ctx.lineTo(cx - 14, cy + 14);
+      ctx.stroke();
+      return new THREE.CanvasTexture(canvas);
+    }
+
+    const material = new THREE.PointsMaterial({
+      size: 7, vertexColors: true, transparent: true, opacity: 0.95,
+      map: createStarTexture(), blending: THREE.AdditiveBlending, depthWrite: false
+    });
+    const starField = new THREE.Points(geometry, material);
+    scene.add(starField);
+
+    let mouseX = 0, mouseY = 0;
+    window.addEventListener('mousemove', (e) => {
+      mouseX = (e.clientX / window.innerWidth - 0.5);
+      mouseY = (e.clientY / window.innerHeight - 0.5);
+    });
+
+    function resize(){
+      const w = heroSection.clientWidth, h = heroSection.clientHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    }
+    window.addEventListener('resize', resize);
+
+    function animate(){
+      requestAnimationFrame(animate);
+      starField.rotation.y += 0.0009;
+      starField.rotation.x += 0.0002;
+      camera.position.x += (mouseX * 90 - camera.position.x) * 0.03;
+      camera.position.y += (-mouseY * 60 - camera.position.y) * 0.03;
+      camera.lookAt(scene.position);
+      renderer.render(scene, camera);
+    }
+    animate();
+  })();
+</script>
+<script>
+  // --- smooth trailing cursor ---
+  const cursor = document.getElementById('cursor');
+  const trail = document.getElementById('cursor-trail');
+  let mouseX=0, mouseY=0, trailX=0, trailY=0;
+  window.addEventListener('mousemove', e=>{
+    mouseX = e.clientX; mouseY = e.clientY;
+    cursor.style.left = mouseX+'px';
+    cursor.style.top = mouseY+'px';
+  });
+  function animateTrail(){
+    trailX += (mouseX - trailX) * 0.15;
+    trailY += (mouseY - trailY) * 0.15;
+    trail.style.left = trailX+'px';
+    trail.style.top = trailY+'px';
+    requestAnimationFrame(animateTrail);
+  }
+  animateTrail();
+
+  document.querySelectorAll('[data-hover], a, button').forEach(el=>{
+    el.addEventListener('mouseenter', ()=>{cursor.classList.add('big'); trail.classList.add('big');});
+    el.addEventListener('mouseleave', ()=>{cursor.classList.remove('big'); trail.classList.remove('big');});
+  });
+
+  // --- 3D tilt on cards ---
+  document.querySelectorAll('.tilt-card').forEach(card=>{
+    card.addEventListener('mousemove', e=>{
+      const r = card.getBoundingClientRect();
+      const x = e.clientX - r.left, y = e.clientY - r.top;
+      const cx = r.width/2, cy = r.height/2;
+      const rotateY = ((x-cx)/cx) * 8;
+      const rotateX = -((y-cy)/cy) * 8;
+      card.style.transform = `perspective(700px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(6px)`;
+      card.style.setProperty('--mx', (x/r.width*100)+'%');
+      card.style.setProperty('--my', (y/r.height*100)+'%');
+    });
+    card.addEventListener('mouseleave', ()=>{
+      card.style.transform = 'perspective(700px) rotateX(0) rotateY(0) translateZ(0)';
+    });
+  });
+
+  // --- magnetic buttons ---
+  document.querySelectorAll('.magnetic').forEach(btn=>{
+    btn.addEventListener('mousemove', e=>{
+      const r = btn.getBoundingClientRect();
+      const x = e.clientX - r.left - r.width/2;
+      const y = e.clientY - r.top - r.height/2;
+      btn.style.transform = `translate(${x*0.25}px, ${y*0.3}px)`;
+    });
+    btn.addEventListener('mouseleave', ()=>{ btn.style.transform = 'translate(0,0)'; });
+  });
+
+  // --- football that follows scroll, and enters the goal at the very bottom ---
+  const scrollBall = document.getElementById('scroll-ball');
+  const goalTarget = document.getElementById('goal-target');
+  const goalText = document.getElementById('goal-text');
+  const fireworksBox = document.getElementById('fireworks');
+  const ENTER_START = 0.93; // scroll % at which the ball starts heading for the goal
+  let goalCelebrated = false;
+  const SPARK_COLORS = ['#E31932', '#C79A3F', '#F6F3EC', '#8E1521'];
+
+  function fireSparks(){
+    for (let i = 0; i < 26; i++) {
+      const s = document.createElement('div');
+      s.className = 'spark fire';
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 40 + Math.random() * 60;
+      s.style.setProperty('--dx', (Math.cos(angle) * dist) + 'px');
+      s.style.setProperty('--dy', (Math.sin(angle) * dist) + 'px');
+      s.style.background = SPARK_COLORS[Math.floor(Math.random() * SPARK_COLORS.length)];
+      s.style.animationDelay = (Math.random() * 0.15) + 's';
+      fireworksBox.appendChild(s);
+      setTimeout(() => s.remove(), 1200);
+    }
+  }
+
+  function updateBall(){
+    const scrollTop = window.scrollY;
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = maxScroll > 0 ? scrollTop / maxScroll : 0;
+    const rotation = scrollTop * 0.7;
+    const travelHeight = window.innerHeight - 90;
+
+    if (pct < ENTER_START) {
+      const y = 30 + (pct / ENTER_START) * travelHeight;
+      const wobble = Math.sin(scrollTop * 0.012) * 16;
+      scrollBall.style.transform = `translate(${wobble}px, ${y}px) rotate(${rotation}deg) scale(1)`;
+      scrollBall.style.opacity = 1;
+      if (goalCelebrated) {
+        goalCelebrated = false;
+        goalText.classList.remove('show');
+      }
+    } else {
+      const enterProgress = Math.min((pct - ENTER_START) / (1 - ENTER_START), 1);
+      const startY = 30 + travelHeight;
+      const startWobble = Math.sin(scrollTop * 0.012) * 16;
+
+      const goalRect = goalTarget.getBoundingClientRect();
+      const anchorX = window.innerWidth - 28 - 23;
+      const targetX = (goalRect.left + goalRect.width / 2) - anchorX;
+      const targetY = (goalRect.top + goalRect.height / 2) - 23;
+
+      const ease = enterProgress * enterProgress; // accelerate into the net
+      const curX = startWobble + (targetX - startWobble) * ease;
+      const curY = startY + (targetY - startY) * ease;
+      const scale = 1 - ease * 0.72;
+
+      scrollBall.style.transform = `translate(${curX}px, ${curY}px) rotate(${rotation}deg) scale(${scale})`;
+      scrollBall.style.opacity = 1 - ease * 0.15;
+
+      if (enterProgress > 0.9 && !goalCelebrated) {
+        goalCelebrated = true;
+        goalText.classList.add('show');
+        fireSparks();
+      }
+    }
+  }
+  window.addEventListener('scroll', () => requestAnimationFrame(updateBall));
+  window.addEventListener('resize', updateBall);
+  updateBall();
+
+  // --- parallax on hero star ---
+  const heroCrest = document.querySelector('.hero-crest');
+  if(heroCrest){
+    window.addEventListener('mousemove', e=>{
+      const px = (e.clientX / window.innerWidth - 0.5) * 24;
+      const py = (e.clientY / window.innerHeight - 0.5) * 24;
+      heroCrest.style.transform = `translateY(calc(-50% + ${py}px)) translateX(${px}px)`;
+    });
+  }
+
+  const header = document.getElementById('site-header');
+  window.addEventListener('scroll', ()=>{ header.classList.toggle('shrink', window.scrollY > 40); });
+
+  // --- staggered scroll reveal ---
+  const els = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const siblings = Array.from(e.target.parentElement.querySelectorAll('.reveal'));
+        const idx = siblings.indexOf(e.target);
+        e.target.style.transitionDelay = (idx * 0.06)+'s';
+        e.target.classList.add('in');
+      }
+    });
+  },{threshold:0.1});
+  els.forEach(el=>io.observe(el));
+
+  const counters = document.querySelectorAll('[data-count]');
+  const cio = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const el = e.target; const target = parseInt(el.dataset.count,10); const dur=1400; const start=performance.now();
+        function tick(now){const p=Math.min((now-start)/dur,1);const eased=1-Math.pow(1-p,3);el.textContent=Math.floor(eased*target);if(p<1)requestAnimationFrame(tick);else el.textContent=target;}
+        requestAnimationFrame(tick); cio.unobserve(el);
+      }
+    });
+  },{threshold:0.5});
+  counters.forEach(c=>cio.observe(c));
+
+  function pad(n){return String(n).padStart(2,'0');}
+  const target = new Date('2026-08-16T11:00:00');
+  function tickCd(){
+    const now = new Date(); let diff = target - now; if(diff<0) diff=0;
+    document.getElementById('cd-d').textContent = pad(Math.floor(diff/86400000));
+    document.getElementById('cd-h').textContent = pad(Math.floor(diff%86400000/3600000));
+    document.getElementById('cd-m').textContent = pad(Math.floor(diff%3600000/60000));
+    document.getElementById('cd-s').textContent = pad(Math.floor(diff%60000/1000));
+  }
+  tickCd(); setInterval(tickCd,1000);
+
+  const words = document.querySelectorAll('.manifesto-text .w');
+  const manifestoSection = document.querySelector('.manifesto');
+  function onScroll(){
+    const rect = manifestoSection.getBoundingClientRect();
+    const total = manifestoSection.offsetHeight - window.innerHeight;
+    const progress = Math.min(Math.max(-rect.top/total,0),1);
+    const activeCount = Math.floor(progress*words.length);
+    words.forEach((w,i)=>{w.classList.toggle('hit', i<activeCount);});
+  }
+  window.addEventListener('scroll', onScroll); onScroll();
+</script>
+</body>
+</html>
