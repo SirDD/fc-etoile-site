@@ -35,7 +35,12 @@ function findNearestCategoryBefore(html: string, pos: number): string | null {
 export default async (req: Request, context: Context) => {
   try {
     const res = await fetch(SOURCE_URL, {
-      headers: { "User-Agent": "Mozilla/5.0 (compatible; FCEtoileSite/1.0)" }
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Accept-Language": "fr-CH,fr;q=0.9,en;q=0.8,de;q=0.7",
+        "Referer": "https://matchcenter.fvbj-afbj.ch/"
+      }
     });
     if (!res.ok) throw new Error(`Réponse ASF: ${res.status}`);
     const html = await res.text();
